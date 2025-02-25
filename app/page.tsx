@@ -1,7 +1,6 @@
 
 "use client"; 
 
-import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import styles from '@/app/ui/home.module.css';
@@ -18,11 +17,11 @@ export default function Page() {
      <p>Home Page</p> 
      <div>
      <Link
-            href='/dashboard'
+            href='/chatbox'
             className={clsx(
               'flex h-[48px] items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
               {
-                'bg-sky-100 text-blue-600': pathname === '/dashboard', 
+                'bg-sky-100 text-blue-600': pathname === '/chatbox', 
               },
             )}
           > 

@@ -9,6 +9,7 @@ import {
   BoldIcon, 
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
+
 export default function ChatInput({sendMessage}) {
   const [message, setMessage] = useState(""); 
   const textAreaRef = useRef(null); // Reference to track cursor position 

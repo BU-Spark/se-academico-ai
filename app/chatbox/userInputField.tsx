@@ -36,7 +36,7 @@ export default function ChatInput({sendMessage}) {
   }; 
 
   return ( 
-    <div className="fixed bottom-0 left-[130px] w-full  p-3">
+    <div className="fixed bottom-0 left-1/4 transform translate-x-0 p-3">   
       {/* Top Action Buttons */}
       <div className="flex space-x-2 mb-2 max-w-2xl mx-auto">
         <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Summarize</button>
@@ -47,7 +47,7 @@ export default function ChatInput({sendMessage}) {
       </div>
 
       {/* Chat Input Box */}
-      <div className="flex flex-col max-w-7xl mx-auto border rounded-lg p-2 shadow-sm bg-gray-50">
+      <div className="flex flex-col max-w-7xl mx-auto border rounded-lg p-2 shadow-sm bg-gray-50">   
       
         {/* Formatting Buttons */} 
         <div className="flex space-x-2 mb-2">
@@ -58,7 +58,7 @@ export default function ChatInput({sendMessage}) {
               <BoldIcon className="h-5 w-5 text-gray-600" />
             </button>
 
-            <button
+            <button 
               className="p-2 hover:bg-gray-200 rounded-md flex items-center"
               onClick={() => applyFormatting("italic")}
             >

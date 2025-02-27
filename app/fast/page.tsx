@@ -17,26 +17,7 @@ const Page: React.FC = () => {
     submitData(inputValue);
   };
 
-  function fetchData() {
-    setLoading(true);
-    fetch('/api/get-text')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Fetched Data:", data);
-        setData(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error.message);
-        setLoading(false);
-      });
-  }
+
 
   function fetchPostData(data: { text: string; }) {
     setLoading(true);

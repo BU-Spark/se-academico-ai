@@ -10,8 +10,12 @@ import {
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
 
+
 export default function ChatInput({sendMessage}) {
   const [message, setMessage] = useState(""); 
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const textAreaRef = useRef(null); // Reference to track cursor position 
   const isEmpty = message.trim() === ""; 
 
@@ -26,10 +30,40 @@ export default function ChatInput({sendMessage}) {
     setMessage(textAreaRef.current.innerHTML); // Save the formatted text
   }; 
 
+  function fetchPostData(data: { text: string; }) {
+    setLoading(true);
+    fetch('/api/process-text', {
+        method: 'POST',  // Use POST method
+        headers: {
+            'Content-Type': 'application/json',  // Specify that we are sending JSON
+        },
+        body: JSON.stringify(data),  // Convert JavaScript object to JSON string
+    })
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then((data) => {
+        console.log("Processed Data:", data);
+        setData(data);  // Assuming setData updates the state with the result
+        setLoading(false);  // Set loading to false once data is fetched
+        alert(`Processed Data: ${JSON.stringify(data)}`); // Show alert with processed data
+    })
+    .catch((error) => {
+        console.error("Error processing data:", error);
+        setError(error.message);  // Assuming setError updates an error state
+        setLoading(false);  // Set loading to false even on error
+        alert(`Error: ${error.message}`); // Show alert with error message
+    });
+  }
+
   // Handle send message 
   const handleSend = () => {
     if (!isEmpty) {
       sendMessage(message);
+      fetchPostData({ text: message }); // Call fetchPostData with the input message
       setMessage(""); // Clear input after sending
       textAreaRef.current.textContent = "";  
     }

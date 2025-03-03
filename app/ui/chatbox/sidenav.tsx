@@ -10,7 +10,7 @@ export default function SideNav() {
   const pathname = usePathname(); 
 
   return (
-    <div className="flex w-[250px] h-full bg-blue-100  flex-col px-3 md:px-2"> 
+    <div className="flex w-[16vw] h-full bg-blue-100  flex-col px-3 md:px-2"> 
       {/* User Profile */}
       <div className="mb-2 flex h-20 items-center justify-start rounded-md bg-blue-400 p-4 md:h-[100px]">
         <div className="w-full text-white items-center space-x-5 md:w-full flex">

@@ -2,6 +2,7 @@
 
 import { useState , useRef} from "react"; 
 import ChatInput from "./userInputField"; 
+import ResearchPapers from "./articlesApprovement"; 
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([]); // chat messages
@@ -42,7 +43,9 @@ export default function ChatBox() {
             ))} 
           </div>
         ))} 
-      </div>
+      </div> 
+      <div><ResearchPapers/></div>;
+
 
 
       {/* Chat Input Field */}

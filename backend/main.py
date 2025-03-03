@@ -14,6 +14,9 @@ import time
 
 from summarization import search_papers
 
+import nest_asyncio
+nest_asyncio.apply()
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

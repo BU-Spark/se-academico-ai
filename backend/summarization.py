@@ -4,6 +4,9 @@ import asyncio
 import feedparser
 from yake import KeywordExtractor
 import os
+import openai
+from paperqa import Settings, ask, Docs
+from dotenv import load_dotenv
 
 async def fetch_data(session, url):
     """Fetches data from a given URL asynchronously."""
@@ -44,4 +47,31 @@ async def search_papers(query):
 
         await asyncio.gather(*tasks)
 
-    return saved_files
+    # Initialize the OpenAI API to answer questions in prompt
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    # Load papers
+
+    docs = Docs()
+    papers_dir = os.listdir("./papers")
+
+    papers_dir = "papers"  
+    for file in os.listdir(papers_dir):
+        file_path = os.path.join(papers_dir, file)
+        
+        if os.path.isfile(file_path):  
+            print(f"Processing file: {file}")
+            docs.add(file_path)
+
+    # calling paperqa
+
+    settings = Settings()
+
+
+    answer_response = docs.query(query
+                             , settings=settings)
+    print(answer_response.answer)
+    return answer_response.answer
+
+   

@@ -1,17 +1,25 @@
 from fastapi import FastAPI, Request, Query
 from summarization import search_papers
+import aiosqlite
+
+from pathlib import Path
+import shutil
 
 import logging
 import asyncio
+
+# Remove SQLITE packages after demo
+import sqlite3
+import time
+
+from summarization import search_papers
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Remove Packages after demo
-import sqlite3
-import time
 
 app = FastAPI()
 
@@ -20,6 +28,24 @@ conn = sqlite3.connect('tasks.db')
 cursor = conn.cursor()
 # reset table
 cursor.execute('DROP TABLE IF EXISTS tasks')
+
+# Clear papers on setup
+def clear_papers_folder():
+    folder = Path('./papers')
+    if folder.exists():
+        for file_path in folder.iterdir():
+            try:
+                if file_path.is_file() or file_path.is_symlink():
+                    file_path.unlink()
+                elif file_path.is_dir():
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                logger.error(f'Failed to delete {file_path}. Reason: {e}')
+    else:
+        folder.mkdir(parents=True, exist_ok=True)
+    logger.info("Cleared papers folder")
+    
+clear_papers_folder()
 
 # Create table if it doesn't exist
 cursor.execute('''
@@ -76,18 +102,19 @@ async def poll_db(task_id: int = Query(..., description="The ID of the task to p
     return {"task_id": task[0], "query": task[1], "result": task[2], "processed": task[3]}
     
 async def process_tasks():
-    while True:
-        cursor.execute('SELECT * FROM tasks WHERE processed = 0 LIMIT 1')
-        task = cursor.fetchone()
-        if task:
-            task_id, query, result, processed = task
-            logger.info(f"Processing task: {task_id}")
-            # Simulate processing the task
-            result = f"processed({query})"
-            cursor.execute('UPDATE tasks SET result = ?, processed = 1 WHERE task_id = ?', (result, task_id))
-            conn.commit()
-            logger.info(f"Task {task_id} processed with result: {result}")
-        await asyncio.sleep(5)
+    async with aiosqlite.connect('tasks.db') as db:
+        while True:
+            async with db.execute('SELECT * FROM tasks WHERE processed = 0 LIMIT 1') as cursor:
+                task = await cursor.fetchone()
+                if task:
+                    task_id, query, result, processed = task
+                    logger.info(f"Processing task: {task_id}")
+                    # Simulate processing the task
+                    result = await search_papers(query)
+                    await db.execute('UPDATE tasks SET result = ?, processed = 1 WHERE task_id = ?', (str(result), task_id))
+                    await db.commit()
+                    logger.info(f"Task {task_id} processed with result: {result}")
+            await asyncio.sleep(5)
         
 @app.on_event("startup")
 async def startup_event():

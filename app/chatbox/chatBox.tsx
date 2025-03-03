@@ -1,18 +1,51 @@
 "use client";  
 
-import { useState , useRef} from "react"; 
-import ChatInput from "./userInputField"; 
+import { useState , useRef, useEffect} from "react"; 
+import ChatInput from "./userInputField";
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([]); // chat messages
+  const [currentTask, setCurrentTask] = useState(null);
+  const intervalRef = useRef(null); // Reference to store the interval ID
 
   // Function to handle sending a new message
   const sendMessage = (newMessage) => {
     if (newMessage.trim() !== "") {
       setMessages([...messages, newMessage]); // Add new message at the bottom 
     }
-  }; 
+  };
+  
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current); // Clear the previous interval
+    }
 
+    if (currentTask) {
+      intervalRef.current = setInterval(async () => {
+        try {
+          const response = await fetch(`/api/poll-db?task_id=${currentTask}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log("Polling...", data);
+          if (data.processed) {
+            sendMessage(data.result); // Update the task result
+            clearInterval(intervalRef.current); // Clear the interval once the task is processed
+            intervalRef.current = null; // Reset the interval reference
+          }
+        } catch (error) {
+          console.error("Error polling task status:", error);
+        }
+      }, 3000); // Poll every 3 seconds
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current); // Cleanup on unmount
+      }
+    };
+  }, [currentTask]);
   return (
     <div className="flex overflow-y-auto flex-col h-[600px] p-2 w-[1320px] px-[50px]">
       {/* Chat Display */} 
@@ -46,7 +79,7 @@ export default function ChatBox() {
 
 
       {/* Chat Input Field */}
-      <ChatInput sendMessage={sendMessage} />
+      <ChatInput sendMessage={sendMessage} setCurrentTask = {setCurrentTask}/>
     </div>
   );
 }

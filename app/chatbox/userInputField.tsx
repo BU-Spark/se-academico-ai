@@ -1,6 +1,6 @@
 "use client"; 
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   ListBulletIcon,
   PaperClipIcon,
@@ -10,15 +10,14 @@ import {
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
 
-
-export default function ChatInput({sendMessage}) {
+export default function ChatInput({sendMessage, setCurrentTask}) {
   const [message, setMessage] = useState(""); 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const textAreaRef = useRef(null); // Reference to track cursor position 
   const isEmpty = message.trim() === ""; 
-
+  
   // Function to apply real formatting (bold, italic, lists)
   const applyFormatting = (command) => {
     if (!textAreaRef.current) return;
@@ -32,7 +31,7 @@ export default function ChatInput({sendMessage}) {
 
   function fetchPostData(data: { text: string; }) {
     setLoading(true);
-    fetch('/api/process-text', {
+    fetch('/api/submit-query', {
         method: 'POST',  // Use POST method
         headers: {
             'Content-Type': 'application/json',  // Specify that we are sending JSON
@@ -48,8 +47,9 @@ export default function ChatInput({sendMessage}) {
     .then((data) => {
         console.log("Processed Data:", data);
         setData(data);  // Assuming setData updates the state with the result
+        setCurrentTask(data.task_id); // Set the current task ID
         setLoading(false);  // Set loading to false once data is fetched
-        alert(`Processed Data: ${JSON.stringify(data)}`); // Show alert with processed data
+        //alert(`Processed Data: ${JSON.stringify(data)}`); // Show alert with processed data
     })
     .catch((error) => {
         console.error("Error processing data:", error);
@@ -70,7 +70,7 @@ export default function ChatInput({sendMessage}) {
   }; 
 
   return ( 
-    <div className="fixed bottom-0 left-[130px] w-full  p-3">
+    <div className="fixed bottom-0 left-1/4 transform translate-x-0  p-3">
       {/* Top Action Buttons */}
       <div className="flex space-x-2 mb-2 max-w-2xl mx-auto">
         <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Summarize</button>

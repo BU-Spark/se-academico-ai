@@ -39,10 +39,8 @@ export default function ChatInput({sendMessage}) {
     <div className="fixed bottom-0 left-1/4 transform translate-x-0 p-3">   
       {/* Top Action Buttons */}
       <div className="flex space-x-2 mb-2 max-w-2xl mx-auto">
-        <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Summarize</button>
-        <button className="bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm">New Idea</button>
-        <button className="bg-orange-100 text-orange-700 px-3 py-1 rounded-md text-sm">New Analytics</button>
-        <button className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm">Writing Inspection</button>
+        <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Search</button>
+        <button className="bg-orange-100 text-orange-700 px-3 py-1 rounded-md text-sm">Follow-up Question</button>
         <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm">Uploading a document</button>
       </div>
 

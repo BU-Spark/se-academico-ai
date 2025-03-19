@@ -10,20 +10,21 @@ import {
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
 
-export default function ChatInput({sendMessage}) {
-  const [message, setMessage] = useState(""); 
-  const textAreaRef = useRef(null); // Reference to track cursor position 
-  const isEmpty = message.trim() === ""; 
+interface ChatInputProps {
+  sendMessage: (message: string) => void;
+  setCurrentTask: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
-  // Function to apply real formatting (bold, italic, lists)
-  const applyFormatting = (command) => {
-    if (!textAreaRef.current) return;
-    document.execCommand(command, false); 
-  };
+export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProps) {
+  const [message, setMessage] = useState(""); 
+  const textAreaRef = useRef<HTMLDivElement | null>(null); // Reference to track cursor position 
+  const isEmpty = message.trim() === ""; 
 
   // Handle text input 
   const handleInput = () => {
-    setMessage(textAreaRef.current.innerHTML); // Save the formatted text
+    if (textAreaRef.current) {
+      setMessage(textAreaRef.current.innerHTML); // Save the formatted text
+    }
   }; 
 
   // Handle send message 
@@ -31,7 +32,9 @@ export default function ChatInput({sendMessage}) {
     if (!isEmpty) {
       sendMessage(message);
       setMessage(""); // Clear input after sending
-      textAreaRef.current.textContent = "";  
+      if (textAreaRef.current) {
+        textAreaRef.current.textContent = "";  
+      }
     }
   }; 
 
@@ -47,39 +50,6 @@ export default function ChatInput({sendMessage}) {
       {/* Chat Input Box */}
       <div className="flex flex-col max-w-7xl mx-auto border rounded-lg p-2 shadow-sm bg-gray-50">   
       
-        {/* Formatting Buttons */} 
-        <div className="flex space-x-2 mb-2">
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("bold")}
-            >
-              <BoldIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button 
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("italic")}
-            >
-              <ItalicIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("insertOrderedList")}
-            >
-              <NumberedListIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("insertUnorderedList")}
-            >
-              <ListBulletIcon className="h-5 w-5 text-gray-600" />
-            </button>
-        </div>
-
-        
-
         {/* Text Input */} 
         <div
               ref={textAreaRef}

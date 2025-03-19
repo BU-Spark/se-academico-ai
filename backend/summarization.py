@@ -7,6 +7,8 @@ import os
 import openai
 from paperqa import Settings, ask, Docs
 from dotenv import load_dotenv
+from pdf_conversion import convert_pdfs_to_markdown
+from pathlib import Path
 
 async def fetch_data(session, url):
     """Fetches data from a given URL asynchronously."""
@@ -23,7 +25,19 @@ async def download_pdf(session, pdf_url, save_path):
 async def search_papers(query):
     """Searches arXiv for papers based on a query and downloads them asynchronously."""
     query = str(query)
+    papers_dir = Path("./papers")
+    markdown_dir = Path("./markdown_papers")
+
+    # Ensure papers_dir exists
+    if not papers_dir.exists():
+        papers_dir.mkdir(parents=True, exist_ok=True)
+
+    # Only create markdown_dir if it does not exist
+    if not markdown_dir.exists():
+        markdown_dir.mkdir(parents=True)
     os.makedirs("papers", exist_ok=True)
+    os.makedirs("markdown_papers", exist_ok=True)
+
     kw_extractor = KeywordExtractor()
     keywords = kw_extractor.extract_keywords(query)
     out = [words for words, score in keywords if len(words.split()) == 1]
@@ -47,6 +61,23 @@ async def search_papers(query):
 
         await asyncio.gather(*tasks)
 
+    print("Converting now")
+    conversion_tasks = []
+    for paper in saved_files:
+        conversion_tasks.append(convert_pdfs_to_markdown(paper, markdown_dir))
+
+    # Wait for all conversions to complete
+    await asyncio.gather(*conversion_tasks)
+
+    print("Finished converting")
+    
+
+
+
+
+async def analyze_papers(query):
+    """Analyzes the papers using PaperQA."""
+   
     # Initialize the OpenAI API to answer questions in prompt
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -54,9 +85,9 @@ async def search_papers(query):
     # Load papers
 
     docs = Docs()
-    papers_dir = os.listdir("./papers")
+  
 
-    papers_dir = "papers"  
+    papers_dir = "markdown_papers"  
     for file in os.listdir(papers_dir):
         file_path = os.path.join(papers_dir, file)
         

@@ -10,28 +10,66 @@ import {
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
 
-export default function ChatInput({sendMessage}) {
-  const [message, setMessage] = useState(""); 
-  const textAreaRef = useRef(null); // Reference to track cursor position 
-  const isEmpty = message.trim() === ""; 
+interface ChatInputProps {
+  sendMessage: (message: string) => void;
+  setCurrentTask: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
-  // Function to apply real formatting (bold, italic, lists)
-  const applyFormatting = (command) => {
-    if (!textAreaRef.current) return;
-    document.execCommand(command, false); 
-  };
+export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProps) {
+  const [message, setMessage] = useState(""); 
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const textAreaRef = useRef<HTMLDivElement | null>(null); // Reference to track cursor position 
+  const isEmpty = message.trim() === ""; 
 
   // Handle text input 
   const handleInput = () => {
-    setMessage(textAreaRef.current.innerHTML); // Save the formatted text
+    if (textAreaRef.current) {
+      setMessage(textAreaRef.current.innerHTML); // Save the formatted text
+    }
   }; 
+
+  function fetchPostData(data: { text: string; }) {
+    setLoading(true);
+    fetch('/api/submit-query', {
+        method: 'POST',  // Use POST method
+        headers: {
+            'Content-Type': 'application/json',  // Specify that we are sending JSON
+        },
+        body: JSON.stringify(data),  // Convert JavaScript object to JSON string
+    })
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then((data) => {
+        console.log("Processed Data:", data);
+        setData(data);  // Assuming setData updates the state with the result
+        setCurrentTask(data.task_id); // Set the current task ID
+        setLoading(false);  // Set loading to false once data is fetched
+        //alert(`Processed Data: ${JSON.stringify(data)}`); // Show alert with processed data
+    })
+    .catch((error) => {
+        console.error("Error processing data:", error);
+        setError(error.message);  // Assuming setError updates an error state
+        setLoading(false);  // Set loading to false even on error
+        alert(`Error: ${error.message}`); // Show alert with error message
+    });
+  }
+
 
   // Handle send message 
   const handleSend = () => {
     if (!isEmpty) {
-      sendMessage(message);
+      sendMessage(message); 
+      fetchPostData({ text: message }); // Call fetchPostData with the input message      
       setMessage(""); // Clear input after sending
-      textAreaRef.current.textContent = "";  
+      if (textAreaRef.current) {
+        textAreaRef.current.textContent = "";  
+      }
     }
   }; 
 
@@ -47,39 +85,6 @@ export default function ChatInput({sendMessage}) {
       {/* Chat Input Box */}
       <div className="flex flex-col max-w-7xl mx-auto border rounded-lg p-2 shadow-sm bg-gray-50">   
       
-        {/* Formatting Buttons */} 
-        <div className="flex space-x-2 mb-2">
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("bold")}
-            >
-              <BoldIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button 
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("italic")}
-            >
-              <ItalicIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("insertOrderedList")}
-            >
-              <NumberedListIcon className="h-5 w-5 text-gray-600" />
-            </button>
-
-            <button
-              className="p-2 hover:bg-gray-200 rounded-md flex items-center"
-              onClick={() => applyFormatting("insertUnorderedList")}
-            >
-              <ListBulletIcon className="h-5 w-5 text-gray-600" />
-            </button>
-        </div>
-
-        
-
         {/* Text Input */} 
         <div
               ref={textAreaRef}

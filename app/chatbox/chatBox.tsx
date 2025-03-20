@@ -5,27 +5,40 @@ import ChatInput from "./userInputField";
 import ResearchPapers from "./articlesApprovement"; 
 import ChatHistory from "./chatHistory"; 
 
-export default function ChatBox() {
-  const [messages, setMessages] = useState([]); // chat messages
-  const [currentTask, setCurrentTask] = useState(null);
-  const intervalRef = useRef(null); // Reference to store the interval ID
+interface ChatMessage {
+  text: string;
+  sender: "user" | "bot";
+}
 
-  const [replies, setReplies] = useState([]); // chat messages
-  const [showResearchPapers, setShowResearchPapers] = useState(false);
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+}
+
+
+
+export default function ChatBox() {
+  const [messages, setMessages] = useState<string[]>([]); // chat messages
+  const [currentTask, setCurrentTask] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Reference to store the interval ID
+
+  const [replies, setReplies] = useState<string[]>([]); // chat messages
+  const [showResearchPapers, setShowResearchPapers] = useState<boolean>(false);
   const [papers, setPapers] = useState<string[]>([]); // State to store the list of papers
 
-  const [chatHistory, setChatHistory] = useState([]);    // current chat history 
-  const [chatSessions, setChatSessions] = useState([]);  // chat history list 
-  const [currentChat, setCurrentChat] = useState(null);  // current chat history id 
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);    // current chat history 
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);  // chat history list 
+  const [currentChat, setCurrentChat] = useState<string | null>(null);  // current chat history id 
 
   // load chat history 
   useEffect(() => {
-    const savedSessions = JSON.parse(localStorage.getItem("chatSessions")) || [];
+    const savedSessions: ChatSession[] = JSON.parse(localStorage.getItem("chatSessions") || "[]");
     setChatSessions(savedSessions);
   }, []);
   
   // select chat history 
-  const selectChat = (id) => {
+  const selectChat = (id: string) => {
       const session = chatSessions.find((chat) => chat.id === id);
       if (session) {
         setCurrentChat(id);
@@ -34,7 +47,7 @@ export default function ChatBox() {
   };
 
   // update chat history 
-  const updateChatHistory = (newMessages) => {
+  const updateChatHistory = (newMessages: ChatMessage[]) => {
     let updatedSessions = chatSessions.map((chat) =>
       chat.id === currentChat ? { ...chat, messages: newMessages } : chat
     );
@@ -55,11 +68,12 @@ export default function ChatBox() {
 
 
   // Function to handle sending a new message
-  const sendMessage = (newMessage) => {
+  const sendMessage = (newMessage: string) => {
     if (newMessage.trim() !== "") {
       setMessages([...messages, newMessage]); // Add new message at the bottom 
       setChatHistory(prevHistory => [...prevHistory, { text: newMessage, sender: "user" }]);
       updateChatHistory([...chatHistory, { text: newMessage, sender: "user" }]);
+      
     }
   };
 
@@ -73,7 +87,7 @@ export default function ChatBox() {
     return items;
   };
 
-  const sendReply = (newReply) => {
+  const sendReply = (newReply: string) => {
     if (newReply.trim() !== "") {
       setReplies([...replies, newReply]);
       setChatHistory(prevHistory => [...prevHistory, { text: newReply, sender: "bot" }]);
@@ -106,7 +120,7 @@ export default function ChatBox() {
           console.log("Polling...", data);
           if (data.processed) {
             sendReply(data.result); // Update the task result
-            clearInterval(intervalRef.current); // Clear the interval once the task is processed
+            clearInterval(intervalRef.current!); // Clear the interval once the task is processed
             intervalRef.current = null; // Reset the interval reference
           }
         } catch (error) {
@@ -126,7 +140,6 @@ export default function ChatBox() {
     <ChatHistory sessions={chatSessions} selectChat={selectChat} />
 
     <div className="flex flex-col flex-grow overflow-y-auto h-full p-4 w-full ">
-  
       {/* Chat Display */}
       <div className="flex flex-col space-y-2 h-[70vh]">
         {chatHistory.map((chat, index) => (

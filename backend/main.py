@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Query
-from summarization import search_papers
+from summarization import search_papers, analyze_papers
 import aiosqlite
 
 from pathlib import Path
@@ -113,7 +113,8 @@ async def process_tasks():
                     task_id, query, result, processed = task
                     logger.info(f"Processing task: {task_id}")
                     # Simulate processing the task
-                    result = await search_papers(query)
+                    await search_papers(query)
+                    result = await analyze_papers(query)
                     await db.execute('UPDATE tasks SET result = ?, processed = 1 WHERE task_id = ?', (str(result), task_id))
                     await db.commit()
                     logger.info(f"Task {task_id} processed with result: {result}")

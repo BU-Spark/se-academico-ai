@@ -14,7 +14,8 @@ query = ""
 #QUERY BREAKDOWN/KEYWORD EXTRACTION
 ###################################
 
-openRouterAPIKey = "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"
+#fill API key here
+openRouterAPIKey = ""
 sentence_breakdown = requests.post(
   url="https://openrouter.ai/api/v1/chat/completions",
   headers={
@@ -76,6 +77,7 @@ if sentence_breakdown.status_code == 200:
     breakdown_json = json.loads(breakdown_data.get("choices")[0].get("message").get("content"))
 else:
     print(sentence_breakdown.status_code)
+    exit(1)
 
 subject_queries = breakdown_json.get("subject_queries")
 query_conditions = breakdown_json.get("query_conditions")
@@ -137,6 +139,7 @@ if keyword_breakdown.status_code == 200:
     keywords_json = json.loads(breakdown2_data.get("choices")[0].get("message").get("content"))
 else:
     print(keyword_breakdown.status_code)
+    exit(1)
 print(keywords_json)
 
 
@@ -166,8 +169,9 @@ query_params = {
 response = requests.get(url, params=query_params).json()['data']
 pdfs = [(i["openAccessPdf"]["url"], i["title"], i["year"], i["abstract"], i["publicationDate"], i["authors"]) for i in response if i.get("openAccessPdf")]
 
-def cleanName(name):
-    return re.sub(r'[<>:"/\\|?*]', '_', name)
+def cleanName(name, max_length=50):
+  cleaned = re.sub(r'[<>:"/\|?*]', '_', name)
+  return cleaned[:max_length]
 
 directory = r"C:\\Users\\fujii\Downloads\\519ProjectTesting\\Papers"
 

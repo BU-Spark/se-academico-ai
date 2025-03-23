@@ -2,50 +2,107 @@
 
 import { useState , useRef, useEffect} from "react"; 
 import ChatInput from "./userInputField";
+import ResearchPapers from "./articlesApprovement"; 
+import ChatHistory from "./chatHistory"; 
+
+interface ChatMessage {
+  text: string;
+  sender: "user" | "bot";
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+}
+
+
 
 export default function ChatBox() {
-  const [messages, setMessages] = useState([]); // chat messages
-  const [currentTask, setCurrentTask] = useState(null);
-  const intervalRef = useRef(null); // Reference to store the interval ID
+  const [messages, setMessages] = useState<string[]>([]); // chat messages
+  const [currentTask, setCurrentTask] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Reference to store the interval ID
 
-  const [replies, setReplies] = useState([]); // chat messages
+  const [replies, setReplies] = useState<string[]>([]); // chat messages
+  const [showResearchPapers, setShowResearchPapers] = useState<boolean>(false);
+  const [papers, setPapers] = useState<string[]>([]); // State to store the list of papers
+
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);    // current chat history 
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);  // chat history list 
+  const [currentChat, setCurrentChat] = useState<string | null>(null);  // current chat history id 
+
+  // load chat history 
+  useEffect(() => {
+    const savedSessions: ChatSession[] = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+    setChatSessions(savedSessions);
+  }, []);
+  
+  // select chat history 
+  const selectChat = (id: string) => {
+      const session = chatSessions.find((chat) => chat.id === id);
+      if (session) {
+        setCurrentChat(id);
+        setChatHistory(session.messages);
+      }
+  };
+
+  // update chat history 
+  const updateChatHistory = (newMessages: ChatMessage[]) => {
+    let updatedSessions = chatSessions.map((chat) =>
+      chat.id === currentChat ? { ...chat, messages: newMessages } : chat
+    );
+    
+    if (!currentChat) {
+      const newChat = {
+        id: `chat_${Date.now()}`,
+        title: `new chat ${chatSessions.length + 1}`,
+        messages: newMessages,
+      };
+      updatedSessions = [newChat, ...chatSessions];
+      setCurrentChat(newChat.id);
+    }
+
+    setChatSessions(updatedSessions);
+    localStorage.setItem("chatSessions", JSON.stringify(updatedSessions));
+  }; 
 
 
   // Function to handle sending a new message
-  const sendMessage = (newMessage) => {
+  const sendMessage = (newMessage: string) => {
     if (newMessage.trim() !== "") {
       setMessages([...messages, newMessage]); // Add new message at the bottom 
+      setChatHistory(prevHistory => [...prevHistory, { text: newMessage, sender: "user" }]);
+      updateChatHistory([...chatHistory, { text: newMessage, sender: "user" }]);
+      
     }
   };
 
-  const sendReply = (newReply) => {
+  const parseReplyString = (replyString: string): string[] => {
+    // Remove the square brackets at the start and end
+    const trimmedString = replyString.slice(1, -1);
+    
+    // Split the string by comma and trim whitespace and quotes
+    const items = trimmedString.split(',').map(item => item.trim().replace(/^['"]|['"]$/g, ''));
+    
+    return items;
+  };
+
+  const sendReply = (newReply: string) => {
     if (newReply.trim() !== "") {
-      setReplies([...replies, newReply]); // Add new message at the bottom 
-    }
+      setReplies([...replies, newReply]);
+      setChatHistory(prevHistory => [...prevHistory, { text: newReply, sender: "bot" }]);
+      
+      console.log(newReply);
+      
+      const pdfList = parseReplyString(newReply);
+
+      setPapers(pdfList);
+
+      setShowResearchPapers(true); // Show ResearchPapers component when a reply is received
+      updateChatHistory([...chatHistory, { text: newReply, sender: "bot" }]);
+    } 
   };
 
-  const chatHistory = [];
-  const maxLength = Math.max(messages.length, replies.length);
-  for (let i = 0; i < maxLength; i++) {
-    if (i < messages.length) chatHistory.push({ text: messages[i].replace(/<\/?div>/g, "\n").replace(/<br\s*\/?>/g, "\n \n").split("\n").map((line, i) => (
-      // <p key={i} className="whitespace-pre-wrap">{line}</p>
-        <p key={i} className="whitespace-pre-wrap">
-          {/* Apply Formattingy */}
-          {line
-            .split(/(<b>.*?<\/b>|<i>.*?<\/i>)/g)
-            .map((part, j) => {
-              if (/<b>.*<\/b>/.test(part)) {
-                return <b key={j}>{part.replace(/<\/?b>/g, "")}</b>; // bold
-              }
-              if (/<i>.*<\/i>/.test(part)) {
-                return <i key={j}>{part.replace(/<\/?i>/g, "")}</i>; // italic
-              }
-              return part;
-            })} </p>
-     
-          )), sender: "user" });
-    if (i < replies.length) chatHistory.push({ text: replies[i], sender: "bot" });
-  } 
   
   useEffect(() => {
     if (intervalRef.current) {
@@ -63,7 +120,7 @@ export default function ChatBox() {
           console.log("Polling...", data);
           if (data.processed) {
             sendReply(data.result); // Update the task result
-            clearInterval(intervalRef.current); // Clear the interval once the task is processed
+            clearInterval(intervalRef.current!); // Clear the interval once the task is processed
             intervalRef.current = null; // Reset the interval reference
           }
         } catch (error) {
@@ -78,11 +135,13 @@ export default function ChatBox() {
       }
     };
   }, [currentTask]);
-  return (
-    <div className="flex overflow-y-auto flex-col h-[600px] p-2 w-[1320px] px-[50px]">
-  
+  return ( 
+    <div className="flex">
+    <ChatHistory sessions={chatSessions} selectChat={selectChat} />
+
+    <div className="flex flex-col flex-grow overflow-y-auto h-full p-4 w-full ">
       {/* Chat Display */}
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2 h-[70vh]">
         {chatHistory.map((chat, index) => (
           <div
             key={index}
@@ -96,10 +155,13 @@ export default function ChatBox() {
           </div>
         ))}
       </div>
+      <div>{showResearchPapers && <ResearchPapers papers = {papers}/>}</div>
+
 
 
       {/* Chat Input Field */}
       <ChatInput sendMessage={sendMessage} setCurrentTask = {setCurrentTask}/>
     </div>
+    </div> 
   );
 }

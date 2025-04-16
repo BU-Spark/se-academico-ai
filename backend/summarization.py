@@ -9,6 +9,14 @@ from paperqa import Settings, ask, Docs
 from dotenv import load_dotenv
 from pdf_conversion import convert_pdfs_to_markdown
 from pathlib import Path
+import logging
+from search import *
+
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 async def fetch_data(session, url):
     """Fetches data from a given URL asynchronously."""
@@ -22,55 +30,6 @@ async def download_pdf(session, pdf_url, save_path):
             async with aiofiles.open(save_path, "wb") as f:
                 await f.write(await response.read())
 
-async def search_papers(query):
-    """Searches arXiv for papers based on a query and downloads them asynchronously."""
-    query = str(query)
-    papers_dir = Path("./papers")
-    markdown_dir = Path("./markdown_papers")
-
-    # Ensure papers_dir exists
-    if not papers_dir.exists():
-        papers_dir.mkdir(parents=True, exist_ok=True)
-
-    # Only create markdown_dir if it does not exist
-    if not markdown_dir.exists():
-        markdown_dir.mkdir(parents=True)
-    os.makedirs("papers", exist_ok=True)
-    os.makedirs("markdown_papers", exist_ok=True)
-
-    kw_extractor = KeywordExtractor()
-    keywords = kw_extractor.extract_keywords(query)
-    out = [words for words, score in keywords if len(words.split()) == 1]
-
-    toAPI = "search_query=" + "+AND+".join(f"all:{keyword}" for keyword in out)
-    url = f"http://export.arxiv.org/api/query?{toAPI}&max_results=3"
-
-    async with aiohttp.ClientSession() as session:
-        data = await fetch_data(session, url)
-        feed = feedparser.parse(data)
-
-        tasks = []
-        saved_files = []
-
-        for entry in feed.entries:
-            pdf_url = next(d.href for d in entry.links if d.get("title") == "pdf")
-            name = pdf_url.split("/")[-1]
-            save_path = f"./papers/{name}.pdf"
-            tasks.append(download_pdf(session, pdf_url, save_path))
-            saved_files.append(save_path)
-
-        await asyncio.gather(*tasks)
-
-    print("Converting now")
-    conversion_tasks = []
-    for paper in saved_files:
-        conversion_tasks.append(convert_pdfs_to_markdown(paper, markdown_dir))
-
-    # Wait for all conversions to complete
-    await asyncio.gather(*conversion_tasks)
-
-    print("Finished converting")
-    
 
 
 
@@ -90,6 +49,9 @@ async def analyze_papers(query):
     papers_dir = "markdown_papers"  
     for file in os.listdir(papers_dir):
         file_path = os.path.join(papers_dir, file)
+
+        logger.info(f"File path:{file_path}")
+        logger.info(f"Type:{type(file_path)}")
         
         if os.path.isfile(file_path):  
             print(f"Processing file: {file}")

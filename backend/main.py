@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Request, Query
-from summarization import search_papers, analyze_papers
 import aiosqlite
 
 from pathlib import Path
@@ -12,7 +11,8 @@ import asyncio
 import sqlite3
 import time
 
-from summarization import search_papers
+from search import *
+from summarization import *
 
 import nest_asyncio
 nest_asyncio.apply()
@@ -113,7 +113,7 @@ async def process_tasks():
                     task_id, query, result, processed = task
                     logger.info(f"Processing task: {task_id}")
                     # Simulate processing the task
-                    await search_papers(query)
+                    await search_and_download_async(query)
                     result = await analyze_papers(query)
                     await db.execute('UPDATE tasks SET result = ?, processed = 1 WHERE task_id = ?', (str(result), task_id))
                     await db.commit()

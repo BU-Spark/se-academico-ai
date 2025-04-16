@@ -155,7 +155,7 @@ export default function ChatBox() {
           </div>
         ))}
       </div>
-      <div>{showResearchPapers && <ResearchPapers papers = {papers}/>}</div>
+      {/* <div>{showResearchPapers && <ResearchPapers papers = {papers}/>}</div> */}
 
 
 

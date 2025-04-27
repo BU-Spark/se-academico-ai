@@ -220,7 +220,8 @@ async def search_and_download_async(query):
                 "authors": authors,
                 "publicationDate": pub_date,
                 "abstract": abstract,
-                "year": year
+                "year": year,
+                "topics": ss_query,
             }
 
             tasks.append(download_pdf(session, pdf_url, pdf_path))

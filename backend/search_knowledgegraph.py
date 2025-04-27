@@ -3,6 +3,8 @@ from py2neo import Graph
 from pyvis.network import Network
 import os
 import json
+import matplotlib.pyplot as plt
+import networkx as nx
 
 from dotenv import load_dotenv
 
@@ -16,17 +18,28 @@ URI = NEO4J_URI
 AUTH = (NEO4J_USERNAME, NEO4J_PASSWORD)
 
 def load_papers(folder_path):
+    '''
+    Loads the metadata of papers from JSON files in the specified folder.
+    '''
     papers = []
+    print(f"Loading papers from {folder_path}...")
+
     for filename in os.listdir(folder_path):
         if filename.endswith(".json"):
-            with open(os.path.join(folder_path, filename), 'r') as f:
-                paper = json.load(f)
-                papers.append(paper)
+            try:
+                with open(os.path.join(folder_path, filename), 'r') as f:
+                    paper = json.load(f)
+                    papers.append(paper)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON from file {filename}: {e}")
     return papers
 
 def create_knowledge_graph(tx, papers):
     # Create Year node
     for paper in papers:
+        if not paper.get("title"):
+            print(f"Skipping paper due to missing title: {paper.get('title', 'Unknown Title')}")
+            continue
         tx.run("""
             MERGE (y:Year {value: $year})
         """, year=paper["year"])
@@ -35,13 +48,12 @@ def create_knowledge_graph(tx, papers):
         tx.run("""
             MERGE (p:Paper {
                 title: $title,
-                abstract: $abstract,
                 publicationDate: date($publicationDate)
             })
             WITH p
             MATCH (y:Year {value: $year})
             MERGE (p)-[:PUBLISHED_IN]->(y)
-        """, title=paper["title"], abstract=paper["abstract"],
+        """, title=paper["title"], 
                 publicationDate=paper["publicationDate"], year=paper["year"])
 
         # Create Authors and link to paper
@@ -85,27 +97,39 @@ def create_graph():
 
     # Fetch nodes and relationships from Neo4j
     query = """
-        MATCH (n)-[r]->(m)
-        RETURN n, r, m
+    MATCH (a)-[r]->(b)
+    RETURN a, r, b LIMIT 100
     """
-    data = graph.run(query).data()
 
-    # Add nodes and edges to the Pyvis network
-    for record in data:
-        node1 = record['n']
-        node2 = record['m']
-        relationship = record['r']
+    results = graph.run(query)
 
-        net.add_node(node1.identity, label=node1['title'], title=node1['title'])
-        net.add_node(node2.identity, label=node2['name'], title=node2['name'])
-        net.add_edge(node1.identity, node2.identity, label=relationship.type)
+    for record in results:
+        a = dict(record["a"])
+        b = dict(record["b"])
+        rel = type(record["r"]).__name__
+
+        a_id = record["a"].identity
+        b_id = record["b"].identity
+
+        net.add_node(a_id, label=a.get("name") or a.get("title"), title=str(a))
+        net.add_node(b_id, label=b.get("name") or b.get("title"), title=str(b))
+        net.add_edge(a_id, b_id, label=rel)
 
     # Save the network as an HTML file
-    output_folder = "../app/public"  # Specify your desired folder
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    output_folder = os.path.abspath(os.path.join(current_dir, "../public"))
     os.makedirs(output_folder, exist_ok=True)  # Create the folder if it doesn't exist
 
     # Save the network as an HTML file in the specified folder
     output_file_path = os.path.join(output_folder, "knowledge_graph.html")
-    net.show(output_file_path)
+    print(f"Saving graph to {output_file_path}...")
+    net.save_graph(output_file_path)
 
+if __name__ == "__main__":
+    folder_path = "backend/metadata"
+    papers = load_papers(folder_path)
+    batch_insert_papers(papers)
+    print("Knowledge graph data inserted.")
+    create_graph()
+    print("Graph created and saved as HTML.")
 

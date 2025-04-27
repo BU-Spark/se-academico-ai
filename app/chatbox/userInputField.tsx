@@ -10,6 +10,10 @@ import {
   BoldIcon, 
   NumberedListIcon, 
 } from '@heroicons/react/24/outline'; 
+import {usePathname} from 'next/navigation'; 
+import clsx from 'clsx'; 
+import Link from 'next/link'; 
+
 
 interface ChatInputProps {
   sendMessage: (message: string) => void;
@@ -23,6 +27,8 @@ export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProp
   const [loading, setLoading] = useState(false);
   const textAreaRef = useRef<HTMLDivElement | null>(null); // Reference to track cursor position 
   const isEmpty = message.trim() === ""; 
+  const pathname = usePathname(); 
+  const [showIframe, setShowIframe] = useState(false); // State to control iframe visibility
 
   // Handle text input 
   const handleInput = () => {
@@ -74,14 +80,59 @@ export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProp
     }
   }; 
 
+  const handleRunSearchKGScript = async () => {
+    try {
+      const res = await fetch('/api/create_graph', { method: 'POST' });
+      const data = await res.json();
+      console.log('Script output:', data.output);
+      alert('Script ran! Output: ' + data.output);
+    } catch (error) {
+      console.error('Failed to run script:', error);
+      alert('Error running script');
+    }
+  };
+
   return ( 
+    
     <div className="fixed bottom-0 left-1/4 transform translate-x-0 p-3">   
       {/* Top Action Buttons */}
       <div className="flex space-x-2 mb-2 max-w-2xl mx-auto">
-        <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Search</button>
+        {/* <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm">Search</button>
         <button className="bg-orange-100 text-orange-700 px-3 py-1 rounded-md text-sm">Follow-up Question</button>
-        <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm">Uploading a document</button>
+        <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm">Uploading a document</button> */}
+        
+        <div>
+      <div className="flex gap-4">
+        <button
+          className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
+          onClick={handleRunSearchKGScript}
+        >
+          Run Knowledge Graph Generator
+        </button>
+
+        <button
+          onClick={() => setShowIframe(!showIframe)}
+          className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
+        >
+          {showIframe ? 'Hide' : 'Search Knowledge Graph'}
+        </button>
       </div>
+
+
+    </div>
+
+
+        <button className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm">Full Context Knowledge Graph</button> 
+      </div>
+      {showIframe && (
+        <div style={{ width: '100%', height: '600px', marginTop: '1rem' }}>
+          <iframe
+            src="/knowledge_graph.html"
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            title="Static HTML"
+          />
+        </div>
+      )}
 
       {/* Chat Input Box */}
       <div className="flex flex-col max-w-7xl mx-auto border rounded-lg p-2 shadow-sm bg-gray-50">   

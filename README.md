@@ -1,5 +1,27 @@
-## Next.js App Router Course - Starter
+# Setup
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+cd backend
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+python -m venv venv
+
+# Dependencies
+
+pip install -r requirements.txt
+
+pip freeze > requirements.txt
+
+- when adding packages
+
+# Running server (separate terminal)
+
+./venv/Scripts/Activate.ps1
+
+- activates venv
+
+uvicorn main:app --reload
+
+- runs server
+
+deactivate
+
+- closes venv

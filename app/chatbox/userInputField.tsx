@@ -28,7 +28,10 @@ export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProp
   const textAreaRef = useRef<HTMLDivElement | null>(null); // Reference to track cursor position 
   const isEmpty = message.trim() === ""; 
   const pathname = usePathname(); 
+
+  // Variables for iframe used to visualize knowledge graphs
   const [showIframe, setShowIframe] = useState(false); // State to control iframe visibility
+  const [iframeType, setIframeType] = useState('');
 
   // Handle text input 
   const handleInput = () => {
@@ -80,9 +83,29 @@ export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProp
     }
   }; 
 
+  // Handle run script for generating search knowledge graph
+  // This function will be called when the button is clicked
+  // It will send a POST request to the server to run the script
+  // and then display the output in an alert
   const handleRunSearchKGScript = async () => {
     try {
       const res = await fetch('/api/create_graph', { method: 'POST' });
+      const data = await res.json();
+      console.log('Script output:', data.output);
+      alert('Script ran! Output: ' + data.output);
+    } catch (error) {
+      console.error('Failed to run script:', error);
+      alert('Error running script');
+    }
+  };
+
+  // Handle run script for generating main knowledge graph
+  // This function will be called when the button is clicked
+  // It will send a POST request to the server to run the script
+  // and then display the output in an alert
+  const handleRunMainKGScript = async () => {
+    try {
+      const res = await fetch('/api/create_main_graph', { method: 'POST' });
       const data = await res.json();
       console.log('Script output:', data.output);
       alert('Script ran! Output: ' + data.output);
@@ -107,27 +130,56 @@ export default function ChatInput({ sendMessage, setCurrentTask }: ChatInputProp
           className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
           onClick={handleRunSearchKGScript}
         >
-          Run Knowledge Graph Generator
+          Generate Search Knowledge Graph
         </button>
 
         <button
-          onClick={() => setShowIframe(!showIframe)}
+          onClick={() => {
+          setIframeType(iframeType === 'search' ? '' : 'search');
+        }}
           className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
         >
-          {showIframe ? 'Hide' : 'Search Knowledge Graph'}
+          {iframeType === 'search' ? 'Hide' : 'Search Knowledge Graph'}
+        </button>
+        <button
+          className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
+          onClick={handleRunMainKGScript}
+        >
+          Generate Full Context Knowledge Graph
+        </button>
+
+        <button
+          onClick={() => {
+            setIframeType(iframeType === 'full' ? '' : 'full');
+          }}
+          className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm"
+        >
+           {iframeType === 'full' ? 'Hide' : 'Full Context Knowledge Graph'}
         </button>
       </div>
+
+ 
 
 
     </div>
 
 
-        <button className="bg-pink-100 text-pink-700 px-3 py-1 rounded-md text-sm">Full Context Knowledge Graph</button> 
+
       </div>
-      {showIframe && (
+      {iframeType === 'search' && (
         <div style={{ width: '100%', height: '600px', marginTop: '1rem' }}>
           <iframe
             src="/knowledge_graph.html"
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            title="Static HTML"
+          />
+        </div>
+      )}
+
+      {iframeType === 'full' && (
+        <div style={{ width: '100%', height: '600px', marginTop: '1rem' }}>
+          <iframe
+            src="/main_knowledge_graph.html"
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Static HTML"
           />

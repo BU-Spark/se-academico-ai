@@ -5,6 +5,7 @@ import ChatInput from "./userInputField";
 import ResearchPapers from "./articlesApprovement"; 
 import ChatHistory from "./chatHistory"; 
 
+
 interface ChatMessage {
   text: string;
   sender: "user" | "bot";
@@ -155,10 +156,11 @@ export default function ChatBox() {
           </div>
         ))}
       </div>
+      
       {/* <div>{showResearchPapers && <ResearchPapers papers = {papers}/>}</div> */}
 
 
-
+  
       {/* Chat Input Field */}
       <ChatInput sendMessage={sendMessage} setCurrentTask = {setCurrentTask}/>
     </div>

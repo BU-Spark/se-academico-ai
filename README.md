@@ -1,5 +1,7 @@
 # Setup
 
+git clone https://github.com/BU-Spark/se-academico-ai.git
+
 cd backend
 
 python -m venv venv

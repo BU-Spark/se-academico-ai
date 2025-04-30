@@ -66,14 +66,14 @@ def create_knowledge_graph(tx, papers):
             """, authorId=author["authorId"], name=author["name"], title=paper["title"])
 
         # Create Topics and link to paper
-        for topic in paper.get("topics", []):
-            if topic:
-                tx.run("""
-                    MERGE (t:Topic {name: $topic})
-                    WITH t
-                    MATCH (p:Paper {title: $title})
-                    MERGE (p)-[:COVERS]->(t)
-                """, topic=topic, title=paper["title"])
+        # for topic in paper.get("topics", []):
+        #     if topic:
+        #         tx.run("""
+        #             MERGE (t:Topic {topic: $topic})
+        #             WITH t
+        #             MATCH (p:Paper {title: $title})
+        #             MERGE (p)-[:COVERS]->(t)
+        #         """, topic=topic, title=paper["title"])
 
 def batch_insert_papers(papers):
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
@@ -111,8 +111,11 @@ def create_graph():
         a_id = record["a"].identity
         b_id = record["b"].identity
 
-        net.add_node(a_id, label=a.get("name") or a.get("title"), title=str(a))
-        net.add_node(b_id, label=b.get("name") or b.get("title"), title=str(b))
+        node_label_a = a.get("name") or a.get("title") or f"Node {a_id}"
+        node_label_b = b.get("name") or b.get("title") or f"Node {b_id}"
+
+        net.add_node(a_id, label=node_label_a, title=str(a))
+        net.add_node(b_id, label=node_label_b, title=str(b))
         net.add_edge(a_id, b_id, label=rel)
 
     # Save the network as an HTML file

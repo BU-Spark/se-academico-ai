@@ -186,7 +186,7 @@ async def search_and_download_async(query):
 
         keywords_json = json.loads(keyword_result.get("choices")[0].get("message").get("content"))
         print(keywords_json)
-        ss_query = keywords_json["subject_keywords"]
+        ss_query = keywords_json["subject_keywords"].split(",")
 
         # Step 3: Semantic Scholar search
         ss_url = "http://api.semanticscholar.org/graph/v1/paper/search/bulk"
@@ -221,7 +221,8 @@ async def search_and_download_async(query):
                 "publicationDate": pub_date,
                 "abstract": abstract,
                 "year": year,
-                "topics": ss_query,
+                
+                # "topics": ss_query,
             }
 
             tasks.append(download_pdf(session, pdf_url, pdf_path))

@@ -52,7 +52,19 @@ Ensure you have the following installed:
    pip install -r requirements.txt
    ```
 
-3. Set up the frontend:
+3. Install Rust
+   ```
+   https://rustup.rs # (For Windows)
+
+   brew install rustup-init # (For Mac OS)
+   rustup-init
+
+   Verify Installation
+   rustc --version
+   cargo --version
+   ```
+
+4. Set up the frontend:
    ```bash
    cd ../frontend
    npm install

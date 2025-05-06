@@ -78,6 +78,12 @@ Ensure you have the following installed:
 
 ---
 
+## Technical Architectures
+
+![MainTA]()
+
+![KnowledgeGraphTA]()
+
 ## How to Contribute
 
 We welcome contributions from all students! Whether it’s improving UI/UX, enhancing LLM prompts, optimizing backend performance, or fixing bugs, your help is appreciated.

@@ -39,6 +39,7 @@ Ensure you have the following installed:
 
    ```bash
    git clone https://github.com/BU-Spark/se-academico-ai.git
+   git checkout dev
    cd se-academico-ai
    ```
 

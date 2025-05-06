@@ -2,7 +2,6 @@
 
 import { useState , useRef, useEffect} from "react"; 
 import ChatInput from "./userInputField";
-import ResearchPapers from "./articlesApprovement"; 
 import ChatHistory from "./chatHistory"; 
 
 
@@ -25,7 +24,6 @@ export default function ChatBox() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null); // Reference to store the interval ID
 
   const [replies, setReplies] = useState<string[]>([]); // chat messages
-  const [showResearchPapers, setShowResearchPapers] = useState<boolean>(false);
   const [papers, setPapers] = useState<string[]>([]); // State to store the list of papers
 
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);    // current chat history 
@@ -99,7 +97,6 @@ export default function ChatBox() {
 
       setPapers(pdfList);
 
-      setShowResearchPapers(true); // Show ResearchPapers component when a reply is received
       updateChatHistory([...chatHistory, { text: newReply, sender: "bot" }]);
     } 
   };
@@ -157,7 +154,6 @@ export default function ChatBox() {
         ))}
       </div>
       
-      {/* <div>{showResearchPapers && <ResearchPapers papers = {papers}/>}</div> */}
 
 
   

@@ -80,9 +80,9 @@ Ensure you have the following installed:
 
 ## Technical Architectures
 
-![MainTA]()
+![MainTA](Images/LitReviewTA.png)
 
-![KnowledgeGraphTA]()
+![KnowledgeGraphTA](Images/KGTA.png)
 
 ## How to Contribute
 

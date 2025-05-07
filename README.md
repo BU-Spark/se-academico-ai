@@ -15,7 +15,7 @@ Welcome to **Academico AI**! This repository is part of the **CS/DS 519 Software
 5. [Project Structure](#project-structure)
 6. [Resources](#resources)
 7. [Steps](#steps)
-7. [Maintainers](#maintainers)
+8. [Maintainers](#maintainers)
 
 ---
 
@@ -32,18 +32,18 @@ Ensure you have the following installed:
 
 ### API Keys
 
-- [Neo4j Desktop or Aura](https://neo4j.com/)
-- [OpenRouter API Keys](https://openrouter.ai/)
-- [OpenAI API Key](https://openai.com/api/)
+- [OpenAI API Key](https://openai.com/api/) **Paid**
+- [Neo4j Desktop or Aura](https://neo4j.com/) **Free**
+- [OpenRouter API Keys](https://openrouter.ai/) **Free**
 - [Semantic Scholar API Key (Optional)](https://www.semanticscholar.org/product/api)
-  
-It is necessary to have an OpenAI API Key, an OpenRouter API Key, and 2 Neo4J Aura instances. 
 
-OpenAI is a paid API key. 
+It is necessary to have an OpenAI API Key, an OpenRouter API Key, and 2 Neo4J Aura instances.
+
+OpenAI is a paid API key.
 
 It is possible to use the project with a free OpenRouter API Key, but the project performs better with paid models.
 
-A Semantic Scholar API Key is not necessarily required, but be mindful that without one, the project uses public shared bandwidth. 
+A Semantic Scholar API Key is not necessarily required, but be mindful that without one, the project uses public shared bandwidth.
 
 ### Setup/Running Project
 
@@ -53,20 +53,11 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    git clone https://github.com/BU-Spark/se-academico-ai.git
    cd se-academico-ai
    git checkout dev
-
    ```
 
-2. Set up the backend:
+2. Install Rust
 
    ```bash
-   cd backend
-   python -m venv venv
-   .\venv\Scripts\activate  # (On Windows PowerShell)
-   pip install -r requirements.txt
-   ```
-
-3. Install Rust
-   ```
    https://rustup.rs # (For Windows)
 
    brew install rustup-init # (For Mac OS)
@@ -77,53 +68,50 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    cargo --version
    ```
 
-4. Set up the frontend:
-   ```bash
-   cd ../frontend
-   npm install
-   ```
-
-
-### Backend
-
-1. Navigate to the backend folder and activate the virtual environment:
-
-   ```bash
-   python -m venv venv
-   pip install -r requirements.txt
-   ./venv/Scripts/Activate.ps1  #Windows
-
-   source venv/bin/activate #Mac
-   ```
-
-2. Run the server:
-
-   ```bash
-   uvicorn main:app --reload
-   ```
 3. Activate the Neo4j Aura database instances
-  
-   https://login.neo4j.com/u/login/identifier?state=hKFo2SB3c0lHeFpReklWTEdDR2QtLXdlSkM2alFCOGFnYnZFZKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIFZkMUJuODVvZzRwSkRiNGFpYlRFdndnNmRwSWo5eHBxo2NpZNkgV1NMczYwNDdrT2pwVVNXODNnRFo0SnlZaElrNXpZVG8
-   
 
-4. To deactivate:
+   https://login.neo4j.com/u/login/identifier?state=hKFo2SB3c0lHeFpReklWTEdDR2QtLXdlSkM2alFCOGFnYnZFZKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIFZkMUJuODVvZzRwSkRiNGFpYlRFdndnNmRwSWo5eHBxo2NpZNkgV1NMczYwNDdrT2pwVVNXODNnRFo0SnlZaElrNXpZVG8
+
+4. Set up .env: <br><br>
+
+   **In project directory, create new .env file with the following:**
+
    ```bash
-   deactivate
+   OPENAI_API_KEY =
+   OPENROUTER_API_KEY =
+   NEO4J_URI =
+   NEO4J_USERNAME =
+   NEO4J_PASSWORD =
+   AURA_INSTANCEID =
+   ALT_NEO4J_URI =
+   ALT_NEO4J_PASSWORD =
    ```
 
+5. Set up the backend: <br><br>
 
-### Frontend
+   **Open new terminal**
 
-1. Navigate to the main directory and run the development server:
+   ```bash
+   cd backend
+   python -m venv venv # Python virtual environment
+
+
+   .\venv\Scripts\activate  # (For Windows)
+   or
+   source venv/bin/activate # (For Mac OS)
+
+   pip install -r requirements.txt
+
+   uvicorn main:app --reload # Run backend server
+   ```
+
+6. Run the frontend: <br><br>
+   **Open new terminal**
+
    ```bash
    npm install
-   npm run dev
+   npm run dev # Run Next.js server
    ```
-
----
-
-
-
 
 ## Technology Stack
 

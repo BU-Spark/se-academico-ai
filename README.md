@@ -9,14 +9,13 @@ Welcome to **Academico AI**! This repository is part of the **CS/DS 519 Software
 ## Table of Contents
 
 1. [Project Overview](#overview)
-2. [Getting Started](#getting-started)
+2. [Setup/Running the Project](#getting-started)
 3. [Technology Stack](#technology-stack)
 4. [How to Contribute](#how-to-contribute)
 5. [Project Structure](#project-structure)
-6. [Running the Project](#running-the-project)
-7. [Resources](#resources)
-8. [Steps](#steps)
-9. [Maintainers](#maintainers)
+6. [Resources](#resources)
+7. [Steps](#steps)
+7. [Maintainers](#maintainers)
 
 ---
 
@@ -27,20 +26,34 @@ Welcome to **Academico AI**! This repository is part of the **CS/DS 519 Software
 Ensure you have the following installed:
 
 - [Node.js](https://nodejs.org/)
-- [Python 3.10+](https://www.python.org/)
+- [Python 3.11+](https://www.python.org/)
 - [MySQL](https://dev.mysql.com/)
-- [Neo4j Desktop or Aura](https://neo4j.com/)
-- [OpenRouter/OpenAI API keys](https://openrouter.ai/)
 - [Git](https://git-scm.com/)
 
-### Installation
+### API Keys
+
+- [Neo4j Desktop or Aura](https://neo4j.com/)
+- [OpenRouter API Keys](https://openrouter.ai/)
+- [OpenAI API Key](https://openai.com/api/)
+- [Semantic Scholar API Key (Optional)](https://www.semanticscholar.org/product/api)
+  
+It is necessary to have an OpenAI API Key, an OpenRouter API Key, and 2 Neo4J Aura instances. 
+
+OpenAI is a paid API key. 
+
+It is possible to use the project with a free OpenRouter API Key, but the project performs better with paid models.
+
+A Semantic Scholar API Key is not necessarily required, but be mindful that without one, the project uses public shared bandwidth. 
+
+### Setup/Running Project
 
 1. Clone the repository:
 
    ```bash
    git clone https://github.com/BU-Spark/se-academico-ai.git
-   git checkout dev
    cd se-academico-ai
+   git checkout dev
+
    ```
 
 2. Set up the backend:
@@ -70,7 +83,47 @@ Ensure you have the following installed:
    npm install
    ```
 
+
+### Backend
+
+1. Navigate to the backend folder and activate the virtual environment:
+
+   ```bash
+   python -m venv venv
+   pip install -r requirements.txt
+   ./venv/Scripts/Activate.ps1  #Windows
+
+   source venv/bin/activate #Mac
+   ```
+
+2. Run the server:
+
+   ```bash
+   uvicorn main:app --reload
+   ```
+3. Activate the Neo4j Aura database instances
+  
+   https://login.neo4j.com/u/login/identifier?state=hKFo2SB3c0lHeFpReklWTEdDR2QtLXdlSkM2alFCOGFnYnZFZKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIFZkMUJuODVvZzRwSkRiNGFpYlRFdndnNmRwSWo5eHBxo2NpZNkgV1NMczYwNDdrT2pwVVNXODNnRFo0SnlZaElrNXpZVG8
+   
+
+4. To deactivate:
+   ```bash
+   deactivate
+   ```
+
+
+### Frontend
+
+1. Navigate to the main directory and run the development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
 ---
+
+
+
 
 ## Technology Stack
 
@@ -159,46 +212,6 @@ se-academico-ai/
 ├── README.md                    # Project overview and instructions
 └── pnpm-lock.yaml               # Lockfile for dependencies
 ```
-
----
-
-## Running the Project
-
-### Backend
-
-1. Navigate to the backend folder and activate the virtual environment:
-
-   ```bash
-   python -m venv venv
-   pip install -r requirements.txt
-   ./venv/Scripts/Activate.ps1  #Windows
-
-   source venv/bin/activate #Mac
-   ```
-
-2. Run the server:
-
-   ```bash
-   uvicorn main:app --reload
-   ```
-3. Activate the Neo4j Aura database instances
-  
-   https://login.neo4j.com/u/login/identifier?state=hKFo2SB3c0lHeFpReklWTEdDR2QtLXdlSkM2alFCOGFnYnZFZKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIFZkMUJuODVvZzRwSkRiNGFpYlRFdndnNmRwSWo5eHBxo2NpZNkgV1NMczYwNDdrT2pwVVNXODNnRFo0SnlZaElrNXpZVG8
-   
-
-4. To deactivate:
-   ```bash
-   deactivate
-   ```
-
-
-### Frontend
-
-1. Navigate to the main directory and run the development server:
-   ```bash
-   npm install
-   npm run dev
-   ```
 
 ---
 

@@ -47,15 +47,7 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
 
 ### Setup/Running Project
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/BU-Spark/se-academico-ai.git
-   cd se-academico-ai
-   git checkout dev
-   ```
-
-2. Install Rust
+1. Install Rust
 
    ```bash
    https://rustup.rs # (For Windows)
@@ -66,6 +58,14 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    Verify Installation
    rustc --version
    cargo --version
+   ```
+
+2. Clone the repository:
+
+   ```bash
+   git clone https://github.com/BU-Spark/se-academico-ai.git
+   cd se-academico-ai
+   git checkout dev
    ```
 
 3. Activate the Neo4j Aura database instances

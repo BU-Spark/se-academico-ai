@@ -92,13 +92,19 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    **Open new terminal**
 
    ```bash
+   # Navigate to project directory
+   cd se-academico-ai
+
    cd backend
-   python -m venv venv # Python virtual environment
+
+   python -m venv venv # Create Python virtual environment
 
 
+   # Run virtual environment
    .\venv\Scripts\activate  # (For Windows)
    or
    source venv/bin/activate # (For Mac OS)
+
 
    pip install -r requirements.txt
 
@@ -109,7 +115,11 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    **Open new terminal**
 
    ```bash
+   # Navigate to project directory
+   cd se-academico-ai
+
    npm install
+
    npm run dev # Run Next.js server
    ```
 

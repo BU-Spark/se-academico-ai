@@ -15,7 +15,7 @@ Welcome to **Academico AI**! This repository is part of the **CS/DS 519 Software
 5. [Project Structure](#project-structure)
 6. [Resources](#resources)
 7. [Steps](#steps)
-8. [Known Bugs/Issues](#Bugs)
+8. [Known Bugs/Issues](#bugs)
 9. [Maintainers](#maintainers)
    
 
@@ -259,14 +259,6 @@ se-academico-ai/
 
 ---
 
-## Maintainers
-
-- Emily Yang (GitHub: [@EmilyYang47](https://github.com/EmilyYang47))
-- Hiro Fuji (Github: [@fujiihc](https://github.com/fujiihc))
-- Jason Kwok (Github: [@Jkwokhk](https://github.com/Jkwokhk))
-- Shawn Lau (GitHub: [@clow427](https://github.com/clow427))
-
-
 ## Bugs
 
 It is important to note that the search feature has some shortcomings.
@@ -276,3 +268,31 @@ Given a valid user query with multiple subjects, it is possible that no papers a
 This is because a single search query is made with each user query, so the system would search for papers containing multiple keywords. 
 
 There is a chance that given too many subjects, there are no papers that contain these keywords. If you need multiple search subjects, break them up into separate search queries. 
+
+
+LLMs take a while to answer. If nothing appears to be happening from the chatbox, just be patient and allow the program to run. 
+
+Although it is possible to use OpenRouter with free models, the keyword extraction is not as good on the unpaid models. The default model being used in the code is the paid deepseek-r1 model.
+
+
+Cannot run one of our APIs (paperqa) for literature summarization in Windows because one of the dependencies does not support Windows.
+
+It worked for one Windows Machine and not the other.
+
+Would recommend developing in Mac or Ubuntu using Windows Subsystem for Linux (WSL)
+
+Learn more about the installation here:
+[Link](https://learn.microsoft.com/en-us/windows/wsl/install)
+
+
+
+---
+
+## Maintainers
+
+- Emily Yang (GitHub: [@EmilyYang47](https://github.com/EmilyYang47))
+- Hiro Fuji (Github: [@fujiihc](https://github.com/fujiihc))
+- Jason Kwok (Github: [@Jkwokhk](https://github.com/Jkwokhk))
+- Shawn Lau (GitHub: [@clow427](https://github.com/clow427))
+
+

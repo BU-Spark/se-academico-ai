@@ -113,6 +113,10 @@ A Semantic Scholar API Key is not necessarily required, but be mindful that with
    npm run dev # Run Next.js server
    ```
 
+7. Open the app <br>
+
+   **Visit localhost:3000**
+
 ## Technology Stack
 
 **Frontend**:
